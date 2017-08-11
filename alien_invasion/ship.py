@@ -1,0 +1,64 @@
+# -*- coding: UTF-8 -*-
+""" ship类负责管理飞船的大部分行为"""
+import pygame
+from pygame.sprite import Sprite
+
+class Ship(Sprite):
+    def __init__(self, ai_settings, screen):
+        """初始化飞船并设置其初始位置"""
+        super().__init__()
+        self.screen = screen
+        self.ai_settings = ai_settings
+
+        # 加载飞船图像并获取其外接矩形
+        self.image = pygame.image.load('images/ship.bmp')
+        self.rect = self.image.get_rect()
+        self.screen_rect = screen.get_rect()
+
+        # 设定飞船的初始位置，将每艘飞船放在屏幕底部中央
+        # 将 self.rect.centerx （飞船中心的x坐标）设置为表示屏幕的矩形的属性 centerx
+        self.rect.centerx = self.screen_rect.centerx
+        self.rect.bottom = self.screen_rect.bottom
+
+        # 在飞船的属性centerx中存储x方向的小数值,在centery中存储y方向的小数值
+        self.centerx = float(self.rect.centerx)
+        self.centery = float(self.rect.centery)
+
+        # 移动标志
+        self.moving_right = False
+        self.moving_left = False
+        self.moving_upper = False
+        self.moving_down = False
+
+        # 飞船是否发射子弹
+        self.fire_bullet = False
+
+    def update(self):
+        """根据移动标志调整飞船的位置"""
+        # 更新飞船的center值，而不是rect
+        if self.moving_right and self.rect.right < self.screen_rect.right:
+            self.centerx += self.ai_settings.ship_speed_factor
+        if self.moving_left and self.rect.left > 0:
+            self.centerx -= self.ai_settings.ship_speed_factor
+        if self.moving_upper and self.rect.top > 0:
+            self.centery -= self.ai_settings.ship_speed_factor
+        if self.moving_down and self.rect.bottom < self.screen_rect.bottom:
+            self.centery += self.ai_settings.ship_speed_factor
+
+        # 更新飞船的位置
+        # 根据self.centerx和self.centery更新rect对象，self.rect.centerx 将只存储 self.center 的整数部分
+        self.rect.centerx = self.centerx
+        self.rect.centery = self.centery
+
+    def blitme(self):
+        """在指定位置绘制飞船"""
+        self.screen.blit(self.image, self.rect)
+
+    def center_ship(self):
+        """让飞船在屏幕上居中"""
+        self.centerx = self.screen_rect.centerx
+        self.centery = self.screen_rect.bottom - (self.rect.height / 2)
+        # 下面的写法是错误的，因为ship_hit()方法这两个重置飞船的位置后，在alien_invasion文件的
+        # 循环中，飞船位置的更新是通过self.centerx和self.centery来更新的
+        # self.rect.centerx = self.screen_rect.centerx
+        # self.rect.centery = self.screen_rect.bottom
