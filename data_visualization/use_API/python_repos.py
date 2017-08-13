@@ -1,5 +1,10 @@
 # -*- coding: UTF-8 -*-
-"""执行API调用并存储响应"""
+"""
+执行API调用并存储响应,分析GitHub上的数据
+
+大多数API都存在速率限制，即你在特定时间内可执行的请求数存在限制:
+    https://api.github.com/rate_limit页面中的search项
+"""
 import requests
 import pygal
 from pygal.style import LightColorizedStyle as LCS, LightenStyle as LS
@@ -21,7 +26,8 @@ names, plot_dicts = [], []
 for repo_dict in repo_dicts:
     names.append(repo_dict['name'])
     description = repo_dict['description']
-    if not description:   # 每一个repo的描述可能为None,所以需要判断一下
+    # description可能为None,此时需要直接赋值为'None'
+    if not description:
         description = "None"
     plot_dict = {
         'value': repo_dict['stargazers_count'],
@@ -41,7 +47,7 @@ my_config.show_legend = False    # 隐藏了图例（show_legend=False）
 my_config.title_font_size = 24   # 设置图表标题的大小
 my_config.label_font_size = 14   # 设置标签的大小
 # 主标签是y轴上为5000整数倍的刻度；这些标签应更大，以与副标签区分开来
-my_config.major_label_font_size = 18
+my_config.major_label_font_size = 22
 my_config.truncate_label = 15  # truncate_label将较长的项目名缩短为15个字符
 my_config.show_y_guides = False  # 隐藏图表中的水平线
 my_config.width = 1000
